@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
@@ -16,13 +17,21 @@ app.set('views', './views');
 // Middleware pour les fichiers statiques (CSS, JS, images)
 app.use(express.static('public'));
 
-app.use(express.json());
-app.use(cors());
-
 app.set("views", path.join(__dirname, "views"));
 app.set('view engine', 'twig');
 app.set("twig options", { cache: false });
 app.use(express.static(path.join(__dirname, "public")));
+
+// Limit requests
+const limiter = rateLimit({
+    max: 500,
+    windowMs: 60 * 60 * 1000,
+    message: 'Too many requests from this IP, please try again in an hour!'
+})
+
+app.use('/api', limiter);
+app.use(express.json());
+app.use(cors());
 
 // ROUTES GO HERE
 app.get('/', (req, res) => {

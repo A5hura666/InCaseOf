@@ -4,9 +4,9 @@ const Bookings = require('../models/Booking');
 
 router.post('/', async (req, res) => {
     try{
-        const newFleur = new Bookings(req.body);
-        const registeredFleur = await newFleur.save();
-        res.status(200).json(registeredFleur);
+        const newBookings = new Bookings(req.body);
+        const registeredBookings = await newBookings.save();
+        res.status(200).json(registeredBookings);
     }catch (err) {
         res.status(400).json({error: err});
     }
@@ -32,9 +32,9 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     try{
-        const updatedFleur = await Bookings.findByIdAndUpdate
+        const updatedBookings = await Bookings.findByIdAndUpdate
         (req.params.id, req.body, {new: true});
-        res.status(200).json(updatedFleur);
+        res.status(200).json(updatedBookings);
     }catch (err) {
         res.status(400).json({error: err});
     }
@@ -42,8 +42,8 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
         try{
-            const deletedFleur = await Bookings.findByIdAndDelete(req.params.id);
-            res.status(200).json(deletedFleur);
+            const deletedBookings = await Bookings.findByIdAndDelete(req.params.id);
+            res.status(200).json(deletedBookings);
         }catch (err) {
             res.status(400).json({error: err});
         }

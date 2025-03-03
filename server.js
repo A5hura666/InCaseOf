@@ -7,7 +7,14 @@ dotenv.config();
 connectDB();
 
 const app = express();
-const path = require("path")
+const path = require("path");
+
+// Configuration de Twig
+app.set('view engine', 'twig');
+app.set('views', './views');
+
+// Middleware pour les fichiers statiques (CSS, JS, images)
+app.use(express.static('public'));
 
 app.use(express.json());
 app.use(cors());
@@ -21,6 +28,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get('/', (req, res) => {
     res.render('index', { title: 'Accueil' });
 });
+
+app.use('/api/lockers', require('./routes/lockers'));
+app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/users', require('./routes/users'));
 
 
 // Démarrage du serveur

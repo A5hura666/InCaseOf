@@ -1,0 +1,42 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <div class="container mx-auto mt-4">
+        <h1 class="text-2xl font-bold text-center">Liste des Utilisateurs</h1>
+
+        {% if users and users|length > 0 %}
+            <table class="min-w-full mt-4">
+                <thead>
+                <tr class="bg-gray-200">
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Nom</th>
+                    <th class="px-4 py-2">Email</th>
+                    <th class="px-4 py-2">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr class="border-b">
+                        <td class="px-4 py-2">{{ user._id }}</td>
+                        <td class="px-4 py-2">{{ user.firstName }} {{ user.lastName }}</td>
+                        <td class="px-4 py-2">{{ user.email }}</td>
+                        <td class="px-4 py-2">
+                            <a href="/users/{{ user._id }}" class="text-blue-500 hover:underline">Voir</a>
+                            <a href="/users/edit/{{ user._id }}" class="text-yellow-500 hover:underline">Modifier</a>
+                            <form action="/users/{{ user._id }}" method="POST" class="inline">
+                                <button type="submit" class="text-red-500 hover:underline">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="mt-4 text-center">Aucun utilisateur trouvé.</p>
+        {% endif %}
+
+        <div class="mt-4 text-center">
+            <a href="/auth/register" class="bg-blue-500 text-white rounded p-2">Créer un Nouvel Utilisateur</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
-    const token = req.cookies.jwt;
+    const token = req.cookies.jwt; 
 
     if (!token) {
         return res.status(401).json({ status: 'fail', message: 'Non autorisé' });

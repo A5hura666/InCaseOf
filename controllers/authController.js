@@ -7,10 +7,10 @@ exports.showRegister = (req, res) => {
 };
 
 exports.register = async (req, res) => {
-    const { firstName, lastName, password, role } = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
 
     try {
-        const existingUser = await User.findOne({ firstName });
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).send('Cet utilisateur existe déjà.');
         }
@@ -24,6 +24,7 @@ exports.register = async (req, res) => {
         const newUser = new User({
             firstName,
             lastName,
+            email,
             password: hashedPassword,
             role
         });
@@ -41,10 +42,10 @@ exports.showLogin = (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { firstName, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ firstName });
+        const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(401).send('Utilisateur non trouvé');
@@ -55,12 +56,9 @@ exports.login = async (req, res) => {
             return res.status(401).send('Mot de passe incorrect');
         }
 
-        const isTokenIsCreated = createSendToken(user, 200, res);
-
-        if (isTokenIsCreated) {
+        const token = createSendToken(user, 200, res);
+        if (token) {
             return res.redirect('/');
-        } else {
-            return res.status(500).send('Erreur lors de la connexion. Veuillez réessayer.');
         }
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });

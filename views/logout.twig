@@ -1,0 +1,10 @@
+{% if user %}
+    <div class="mt-4">
+        <p class="text-lg">Connecté en tant que {{ user.firstName }} {{ user.lastName }}</p>
+        <form action="/auth/logout" method="POST">
+            <button type="submit" class="bg-red-500 text-white rounded p-2 mt-2">Se déconnecter</button>
+        </form>
+    </div>
+{% else %}
+    <!-- Boutons pour se connecter ou créer un compte -->
+{% endif %}

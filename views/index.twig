@@ -1,9 +1,28 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-  <h1>{{title}}</h1>
-  <p class="text-red-600">Welcome to {{title}}</p>
+  <h1 class="text-3xl font-bold text-blue-600">{{ title }}</h1>
+  <p class="text-red-600">Welcome to {{ title }}</p>
   <h1 class="text-xs text-red-600">Hello Tailwind !</h1>
-
   <h1 class="text-3xl font-bold text-blue-600">Bienvenue sur mon projet avec TailwindCSS !</h1>
+
+  <!-- Affichage du nom et prénom de l'utilisateur si connecté -->
+  {% if user %}
+    <div class="mt-4">
+      <p class="text-lg">Connecté en tant que {{ user.firstName }} {{ user.lastName }}</p>
+      <form action="/auth/logout" method="POST">
+        <button type="submit" class="bg-red-500 text-white rounded p-2 mt-2">Se déconnecter</button>
+      </form>
+    </div>
+  {% else %}
+    <!-- Bouton pour se connecter -->
+    <div class="mt-4">
+      <a href="/auth/login" class="bg-blue-500 text-white rounded p-2">Se connecter</a>
+    </div>
+
+    <!-- Bouton pour créer un compte -->
+    <div class="mt-4">
+      <a href="/auth/register" class="bg-blue-500 text-white rounded p-2">Créer un compte</a>
+    </div>
+  {% endif %}
 {% endblock %}

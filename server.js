@@ -12,15 +12,15 @@ const path = require("path");
 
 // Configuration de Twig
 app.set('view engine', 'twig');
-app.set('views', './views');
+app.set('views', path.join(__dirname, 'views'));
+app.set("twig options", { cache: false });
 
 // Middleware pour les fichiers statiques (CSS, JS, images)
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.set("views", path.join(__dirname, "views"));
-app.set('view engine', 'twig');
-app.set("twig options", { cache: false });
-app.use(express.static(path.join(__dirname, "public")));
+// Middleware pour parser les données JSON et les données de formulaire
+app.use(express.json()); // Pour les requêtes avec corps JSON
+app.use(express.urlencoded({ extended: true })); // Pour les requêtes avec corps application/x-www-form-urlencoded
 
 // Limit requests
 const limiter = rateLimit({
@@ -30,7 +30,6 @@ const limiter = rateLimit({
 })
 
 app.use('/api', limiter);
-app.use(express.json());
 app.use(cors());
 
 // ROUTES GO HERE
@@ -38,6 +37,10 @@ app.get('/', (req, res) => {
     res.render('index', { title: 'Accueil' });
 });
 
+// Routes d'authentification
+app.use('/auth', require('./routes/auth'));
+
+// Autres routes API
 app.use('/api/lockers', require('./routes/lockers'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/users', require('./routes/users'));

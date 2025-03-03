@@ -18,6 +18,11 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(cors());
 
+app.use('/api/lockers', require('./routes/lockers'));
+app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/users', require('./routes/users'));
+
+
 // ROUTES GO HERE
 app.get('/', (req, res) => {
     res.render('index', { title: 'Accueil' });

@@ -2,7 +2,26 @@
 
 {% block body %}
   <h1 class="text-3xl font-bold text-blue-600">{{ title }}</h1>
-  <p class="text-red-600">Welcome to {{ title }}</p>
-  <h1 class="text-xs text-red-600">Hello Tailwind !</h1>
-  <h1 class="text-3xl font-bold text-blue-600">Bienvenue sur mon projet avec TailwindCSS !</h1>
+
+  <div class="mt-4">
+    <h2 class="text-2xl font-semibold mb-2">Liste des Casiers</h2>
+    <ul class="space-y-2">
+      {% for locker in lockers %}
+        <li class="border p-4 rounded shadow">
+          <p><strong>Numéro de Casier:</strong> {{ locker.lockerNumber }}</p>
+          <p><strong>Taille:</strong> {{ locker.lockerSize.size }}</p>
+          <p><strong>Prix:</strong> {{ locker.lockerPrice }} €</p>
+          <p><strong>Statut:</strong>
+            {% if locker.lockerStatus == 1 %}
+              Disponible
+            {% elseif locker.lockerStatus == 0 %}
+              Réservé
+            {% elseif locker.lockerStatus == 2 %}
+              En maintenance
+            {% endif %}
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
 {% endblock %}

@@ -59,6 +59,10 @@ app.get('/', (req, res) => {
     res.render('index', { title: 'Accueil', user });
 });
 
+app.get('/lockers/create', (req, res) => {
+    res.render('createLocker', { title: 'Créer un Casier' });
+});
+
 // Autres routes API
 app.use('/api/lockers', require('./routes/lockers'));
 app.use('/api/bookings', require('./routes/bookings'));

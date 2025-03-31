@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const { createSendToken, signToken} = require('../utils/jwt');
 
 exports.showRegister = (req, res) => {
-    res.render('register', { title: 'Créer un compte' });
+    res.render('authentification/register', { title: 'Créer un compte' });
 };
 
 exports.register = async (req, res) => {
@@ -38,7 +38,7 @@ exports.register = async (req, res) => {
 };
 
 exports.showLogin = (req, res) => {
-    res.render('login', { title: 'Se connecter' });
+    res.render('authentification/login', { title: 'Se connecter' });
 };
 
 exports.login = async (req, res) => {

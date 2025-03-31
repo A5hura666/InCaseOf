@@ -14,8 +14,8 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const fleurs = await Locker.find();
-    res.status(200).json(fleurs);
+    const lockers = await Locker.find();
+    res.status(200).json(lockers);
   } catch (err) {
     res.status(400).json({ error: err });
   }

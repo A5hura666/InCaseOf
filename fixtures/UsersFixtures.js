@@ -2,8 +2,9 @@ const Users = require('../models/User');
 
 const loadUsersFixtures = async () => {
 
-    // Supprime les anciennes données (optionnel)
+    // Supprime les anciennes données
     Users.deleteMany({});
+
     const users = [
         {
             email: 'joe.doe@example.com',
@@ -14,20 +15,20 @@ const loadUsersFixtures = async () => {
         {
             email: 'ethan@example.com',
             password: 'password',
-            firstName: 'Joe',
-            lastName: 'Doe',
+            firstName: 'Ethan',
+            lastName: 'Bourguigneau',
         },
         {
             email: 'antoine@example.com',
             password: 'password',
-            firstName: 'Joe',
-            lastName: 'Doe',
+            firstName: 'Antoine',
+            lastName: 'Berthillot',
         },
         {
             email: 'valentin@example.com',
             password: 'password',
-            firstName: 'Joe',
-            lastName: 'Doe',
+            firstName: 'Valentin',
+            lastName: 'Gelly',
         },
         {
             email: 'admin@example.com',
@@ -38,6 +39,7 @@ const loadUsersFixtures = async () => {
     ];
 
     await Users.insertMany(users);
+    console.log('Nouvelles fixtures Users insérées');
 
 };
 

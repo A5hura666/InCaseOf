@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Bookings = require("../models/Booking");
+const {LockerManager} = require("../manager/LockerManager");
 
 router.post("/", async (req, res) => {
   try {
-    const lockerBooked = LockManager.getLockerById(req.body.lockerId);
+    const lockerBooked = LockerManager.findLockerById(req.body.lockerId);
     if (lockerBooked && lockerBooked.lockerStatus === 1) {
       const newBookings = new Bookings(req.body);
       const registeredBookings = await newBookings.save();

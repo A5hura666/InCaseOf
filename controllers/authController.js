@@ -4,6 +4,8 @@ const { createSendToken, signToken} = require('../utils/jwt');
 const {promisify} = require("util");
 const crypto = require('crypto');
 const sendEmail = require('../utils/mailer');
+const path = require('path');
+const fs = require("fs");
 
 exports.showRegister = (req, res) => {
     res.render('authentification/register', { title: 'Créer un compte' });
@@ -97,14 +99,15 @@ exports.forgotPassword = async (req, res) => {
 
         const resetURL = `${process.env.BASE_URL}/auth/reset-password/${token}`;
 
-        console.log("Envoi du mail à:", user.email);
+        const emailTemplatePath = path.join(__dirname, '..', 'views', 'emails', 'reset-password.html');
+        let emailHTML = fs.readFileSync(emailTemplatePath, 'utf-8');
+        emailHTML = emailHTML.replace('{{resetURL}}', resetURL);
+
         await sendEmail({
             to: user.email,
             subject: 'Réinitialisation de votre mot de passe',
-            html: `<p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-             <a href="${resetURL}" class="text-blue-500">${resetURL}</a>`
+            html: emailHTML
         });
-        console.log("Mail envoyé !");
 
         res.render('authentification/forgot-password', { message: "Un e-mail de réinitialisation a été envoyé." });
     } catch (error) {

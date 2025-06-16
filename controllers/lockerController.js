@@ -13,7 +13,11 @@ exports.postLocker = async (req, res) => {
 exports.getLockers = async (req, res) => {
     try{
         const lockers = await Locker.find();
-        res.status(200).json(lockers);
+        res.render('lockers/lockers-list', {
+            title: 'Liste des casiers',
+            lockers: lockers
+        });
+
     }catch (err) {
         res.status(400).json({error: err});
     }

@@ -37,6 +37,7 @@ app.use(cors());
 
 // Routes d'authentification
 app.use('/auth', require('./routes/auth'));
+app.use('/lockers', require('./routes/lockers'));
 
 // ROUTES GO HERE
 app.get('/', (req, res) => {

@@ -5,14 +5,14 @@ const Lockers = require('../models/Locker');
 const loadBookingsFixtures = async () => {
 
     // Supprime les anciennes données (optionnel)
-    Bookings.deleteMany({});
+    await Bookings.deleteMany({});
 
     const users = await Users.find({});
 
     const lockers = await Lockers.find({});
 
     if (users.length === 0 || lockers.length === 0) {
-        console.log('no user or locker found');
+        console.log('no user or locker found (user = ' + users.length + ', locker = ' + lockers.length + ')');
     }
 
     const bookings = [
@@ -40,6 +40,5 @@ const loadBookingsFixtures = async () => {
 
 };
 
-loadBookingsFixtures().catch((err) => console.error(err));
 
 module.exports = loadBookingsFixtures;

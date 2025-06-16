@@ -3,9 +3,11 @@ const connectDB = require('../config/db');
 const insertUsers = require('./UsersFixtures');
 const insertLockers = require('./LockersFixtures');
 const insertBookings = require('./BookingsFixtures');
+const dotenv = require('dotenv');
 
 
 const loadFixtures = async () => {
+    dotenv.config();
     await connectDB();
 
     await insertUsers();

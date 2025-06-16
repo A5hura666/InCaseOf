@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { createSendToken, signToken} = require('../utils/jwt');
+const {promisify} = require("util");
 
 exports.showRegister = (req, res) => {
     res.render('authentification/register', { title: 'Créer un compte' });
@@ -73,4 +74,42 @@ exports.logout = (req, res) => {
     });
 
     return res.redirect('/');
+};
+
+
+exports.protect = async (req, res, next) => {
+    try {
+    let token;
+    if (req.headers.authorization?.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
+    }
+
+    if (!token) {
+        return res.status(401).json({
+            status: 'fail',
+            message: "Vous n'êtes pas connecté. Veuillez vous connecter."
+        });
+    }
+
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
+        return res.status(401).json({
+            status: 'fail',
+            message: "L'utilisateur n'existe plus. Veuillez vous reconnecter."
+        });
+    }
+
+    req.user = currentUser;
+    res.locals.user = currentUser;
+    next();
+    } catch (err) {
+        res.status(401).json({
+            status: 'fail',
+            message: "Jeton invalide ou expiré. Veuillez vous reconnecter."
+        });
+    }
 };

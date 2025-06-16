@@ -1,4 +1,5 @@
 const Users = require('../models/User');
+const bcrypt = require("bcrypt");
 
 const loadUsersFixtures = async () => {
 
@@ -37,6 +38,10 @@ const loadUsersFixtures = async () => {
             lastName: 'Admin',
         },
     ];
+
+    for (const user of users) {
+        user.password = await bcrypt.hash(user.password, 10);
+    }
 
     await Users.insertMany(users);
     console.log('Nouvelles fixtures Users insérées');

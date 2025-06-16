@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(`mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@127.0.0.1:27017/api_in_case_of?authSource=admin`);
+        await mongoose.connect(`${process.env.MONGO_AUTH_CONNECT_URI}`);
         console.log('Connexion à MongoDB réussie');
     } catch (error) {
         console.error('Erreur de connexion ', error);

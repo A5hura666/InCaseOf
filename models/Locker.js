@@ -7,13 +7,16 @@ const lockerSchema = new mongoose.Schema({
   },
   lockerSize: {
     size: Number,
+    required: true,
+    min: 1
   },
   lockerPrice: {
     type: Number,
   },
   lockerStatus: {
     type: Number,
-    default: 1, // 1 for available, 0 for booked, 2 for under maintenance
+    enum: [0, 1, 2], // 0 = réservé, 1 = dispo, 2 = maintenance
+    default: 1
   },
 });
 

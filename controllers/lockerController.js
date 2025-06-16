@@ -2,6 +2,10 @@ const Locker = require('../models/Locker');
 
 exports.postLocker = async (req, res) => {
     try{
+        if (!req.body.lockerNumber || !req.body.lockerSize || !req.body.lockerPrice) {
+            return res.status(400).json({ error: "Tous les champs sont requis." });
+        }
+
         const newLocker = new Locker(req.body);
         const registeredLocker = await newLocker.save();
         res.status(200).json(registeredLocker);

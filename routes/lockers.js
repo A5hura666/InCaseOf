@@ -4,7 +4,7 @@ const lockerController = require('../controllers/lockerController');
 
 router.post('/', lockerController.postLocker);
 
-router.get('/', lockerController.getLockers);
+router.get('/list', lockerController.getLockers);
 
 router.get('/:id', lockerController.getLockerById);
 

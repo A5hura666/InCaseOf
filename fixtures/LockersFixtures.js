@@ -3,7 +3,7 @@ const Lockers = require('../models/Locker');
 const loadLockersFixtures = async () => {
 
     // Supprime les anciennes données (optionnel)
-    Lockers.deleteMany({});
+    await Lockers.deleteMany({});
 
     const lockers = [
         {
@@ -43,6 +43,5 @@ const loadLockersFixtures = async () => {
 
 };
 
-loadLockersFixtures().catch((err) => console.error(err));
 
 module.exports = loadLockersFixtures;

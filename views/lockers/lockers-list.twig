@@ -1,0 +1,22 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <div class="p-6 max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Réservation de Casier</h1>
+
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            {% for locker in lockers %}
+                <div class="bg-white p-4 rounded shadow hover:shadow-lg transition-shadow">
+                    <h2 class="text-xl font-semibold mb-2">Casier #{{ locker.lockerNumber }}</h2>
+                    <p><strong>Taille:</strong> {{ locker.lockerSize }} cm</p>
+                    <p><strong>Prix:</strong> {{ locker.lockerPrice }} €</p>
+                    <form action="/lockers/{{ locker.id }}/reserve" method="POST" class="mt-4">
+                        <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full hover:bg-blue-600">Réserver</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+
+
+    </div>
+{% endblock %}

@@ -1,10 +1,12 @@
 const Users = require('../models/User');
 const bcrypt = require("bcrypt");
+const Bookings = require("../models/Booking");
+const Lockers = require("../models/Locker");
 
-const loadUsersFixtures = async () => {
+const loadDataFixtures = async () => {
 
     // Supprime les anciennes données
-    Users.deleteMany({});
+    await Users.deleteMany({});
 
     const users = [
         {
@@ -46,8 +48,7 @@ const loadUsersFixtures = async () => {
     await Users.insertMany(users);
     console.log('Nouvelles fixtures Users insérées');
 
+
 };
 
-loadUsersFixtures().catch((err) => console.error(err));
-
-module.exports = loadUsersFixtures;
+module.exports = loadDataFixtures;

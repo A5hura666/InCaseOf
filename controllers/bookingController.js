@@ -17,7 +17,7 @@ exports.postBooking = async (req, res) => {
         if (lockerBooked && lockerBooked.lockerStatus === 1) {
             const newBookings = new Bookings(req.body);
             const registeredBookings = await newBookings.save();
-            lockerBooked.lockerStatus = 0;
+            lockerBooked.lockerStatus = "booked";
             lockerBooked.save();
             res.status(201).json(registeredBookings);
         } else {

@@ -35,7 +35,7 @@ exports.register = async (req, res) => {
         });
 
         await newUser.save();
-        res.redirect('/auth/login');
+        res.redirect('/auth/login', { title: 'Connexion', error: null });
     } catch (error) {
         console.error(error);
         res.status(500).send('Erreur lors de la création de l\'utilisateur');
@@ -53,12 +53,12 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).send('Utilisateur non trouvé');
+            return res.status(401).render('authentification/login', { title: 'Connexion', error: 'Utilisateur non trouvé.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).send('Mot de passe incorrect');
+            return res.status(401).render('authentification/login', { title: 'Connexion', error: 'Mot de passe incorrect.' });
         }
 
         const token = createSendToken(user, 200, res);
@@ -66,7 +66,7 @@ exports.login = async (req, res) => {
             return res.redirect('/');
         }
     } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        res.status(500).render('authentification/login', { title: 'Connexion', error: 'Une erreur est survenue. Veuillez réessayer.' });
     }
 };
 

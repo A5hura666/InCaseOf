@@ -2,7 +2,11 @@
 module.exports = {
   content: ["./views/**/*.{html,js,ejs,twig}"],
   theme: {
-    extend: {},
+    extend: {
+        gridAutoRows: {
+            'locker': '100px',
+        }
+    },
   },
   plugins: [],
 }

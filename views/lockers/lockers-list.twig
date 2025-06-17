@@ -6,34 +6,53 @@
             <h1 class="text-3xl font-bold">Réservation de Casier</h1>
 
             {% if user and user["role"] == 'Admin' %}
-{#                <div class="text-right">#}
-{#                    <a href="/lockers/create" class="m-0 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ Ajouter un casier</a>#}
-{#                </div>#}
                 <button id="openModalBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                     + Ajouter un casier
                 </button>
             {% endif %}
         </div>
 
-        <div class="grid grid-cols-4 gap-4 mb-8">
-            {% for locker in lockers %}
-                <div class="bg-white p-4 rounded shadow hover:shadow-lg transition-shadow">
-                    <h2 class="text-xl font-semibold mb-2">Casier #{{ locker.lockerNumber }}</h2>
-                    <p><strong>Taille:</strong> {{ locker.lockerSize }}</p>
-                    <p><strong>Prix:</strong> {{ locker.lockerPrice }} €</p>
-                    <form action="/lockers/{{ locker.id }}/reserve" method="POST" class="mt-4">
-                        <button type="submit" class="bg-blue-500 text-white rounded p-2 w-full hover:bg-blue-600">Réserver</button>
-                    </form>
-                </div>
+        <div id="lockersGrid" class="grid grid-cols-4 auto-rows-locker gap-4 mb-8">
+            {% for row in lockers %}
+                {% for cell in row %}
+                    {% if cell.start %}
+                        <div
+                                class="bg-white p-4 rounded shadow hover:shadow-lg transition-shadow
+                    col-span-{{ cell.colSpan }} row-span-{{ cell.rowSpan }} relative"
+                                {% if cell.locker.lockerSize == 'small' %}
+                                    style="height: 150px;"
+                                {% else %}
+                                    style="    height: calc(300px + 1rem);"
+                                {% endif %}
+                                {% if user and user["role"] != 'Admin' %}
+                                    onclick='reserveLocker({{ cell.locker.id|json_encode }})'
+                                {% endif %}
+                        >
+                            <h2 class="text-xl font-semibold mb-2">Casier #{{ cell.locker.lockerNumber }}</h2>
+                            <p><strong>Taille:</strong> {{ cell.locker.lockerSize }}</p>
+                            <p><strong>Prix:</strong> {{ cell.locker.lockerPrice }} €</p>
+                            {% if user and user["role"] == 'Admin' %}
+                                <button onclick='reserveLocker({{ cell.locker.id|json_encode }})'
+                                        class="bg-blue-500 text-white rounded p-2 w-full hover:bg-blue-600">Réserver
+                                </button>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
             {% endfor %}
         </div>
     </div>
 
 
 
+
+
+
+
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded shadow-md w-96 relative">
-            <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-black text-lg">&times;</button>
+            <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-black text-lg">&times;
+            </button>
             <h2 class="text-xl font-bold mb-4">Ajouter un Casier</h2>
             <form id="createLockerForm">
                 <p id="formError" class="text-red-500 text-sm mb-4 hidden"></p>
@@ -59,49 +78,49 @@
     </div>
 {% endblock %}
 
-{% block javascripts %}
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const openModalBtn = document.getElementById('openModalBtn');
-            const closeModalBtn = document.getElementById('closeModalBtn');
-            const modal = document.getElementById('modal');
-            const form = document.getElementById('createLockerForm');
-            const errorParagraph = document.getElementById('formError');
-            errorParagraph.classList.add('hidden');
-            errorParagraph.textContent = '';
+{# {% block javascripts %} #}
+{#    <script> #}
+{#        window.addEventListener('DOMContentLoaded', () => { #}
+{#            const openModalBtn = document.getElementById('openModalBtn'); #}
+{#            const closeModalBtn = document.getElementById('closeModalBtn'); #}
+{#            const modal = document.getElementById('modal'); #}
+{#            const form = document.getElementById('createLockerForm'); #}
+{#            const errorParagraph = document.getElementById('formError'); #}
+{#            errorParagraph.classList.add('hidden'); #}
+{#            errorParagraph.textContent = ''; #}
 
-            if (!openModalBtn || !closeModalBtn || !modal || !form) {
-                console.error('Éléments introuvables dans le DOM');
-                return;
-            }
+{#            if (!openModalBtn || !closeModalBtn || !modal || !form) { #}
+{#                console.error('Éléments introuvables dans le DOM'); #}
+{#                return; #}
+{#            } #}
 
-            openModalBtn.addEventListener('click', () => modal.classList.remove('hidden'));
-            closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+{#            openModalBtn.addEventListener('click', () => modal.classList.remove('hidden')); #}
+{#            closeModalBtn.addEventListener('click', () => modal.classList.add('hidden')); #}
 
-            form.addEventListener('submit', async function (e) {
-                e.preventDefault();
+{#            form.addEventListener('submit', async function (e) { #}
+{#                e.preventDefault(); #}
 
-                const data = {
-                    lockerNumber: form.lockerNumber.value,
-                    lockerSize: form.lockerSize.value,
-                    lockerPrice: form.lockerPrice.value
-                };
+{#                const data = { #}
+{#                    lockerNumber: form.lockerNumber.value, #}
+{#                    lockerSize: form.lockerSize.value, #}
+{#                    lockerPrice: form.lockerPrice.value #}
+{#                }; #}
 
-                const res = await fetch('/api/lockers/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+{#                const res = await fetch('/api/lockers/create', { #}
+{#                    method: 'POST', #}
+{#                    headers: { 'Content-Type': 'application/json' }, #}
+{#                    body: JSON.stringify(data) #}
+{#                }); #}
 
-                if (res.ok) {
-                    modal.classList.add('hidden');
-                    location.reload();
-                } else {
-                    const err = await res.json();
-                    errorParagraph.textContent = err.error || 'Erreur inconnue';
-                    errorParagraph.classList.remove('hidden');
-                }
-            });
-        });
-    </script>
-{% endblock %}
+{#                if (res.ok) { #}
+{#                    modal.classList.add('hidden'); #}
+{#                    location.reload(); #}
+{#                } else { #}
+{#                    const err = await res.json(); #}
+{#                    errorParagraph.textContent = err.error || 'Erreur inconnue'; #}
+{#                    errorParagraph.classList.remove('hidden'); #}
+{#                } #}
+{#            }); #}
+{#        }); #}
+{#    </script> #}
+{# {% endblock %} #}

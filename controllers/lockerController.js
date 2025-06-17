@@ -1,18 +1,26 @@
 const Locker = require('../models/Locker');
 
+
 exports.postLocker = async (req, res) => {
-    try{
-        if (!req.body.lockerNumber || !req.body.lockerSize || !req.body.lockerPrice) {
+    try {
+        const { lockerNumber, lockerSize, lockerPrice } = req.body;
+
+        if (!lockerNumber || !lockerSize || !lockerPrice) {
             return res.status(400).json({ error: "Tous les champs sont requis." });
         }
 
-        const newLocker = new Locker(req.body);
+        const existingLocker = await Locker.findOne({ lockerNumber });
+        if (existingLocker) {
+            return res.status(400).json({ error: "Ce numéro de casier est déjà pris." });
+        }
+
+        const newLocker = new Locker({ lockerNumber, lockerSize, lockerPrice });
         const registeredLocker = await newLocker.save();
-        res.status(200).json(registeredLocker);
-    }catch (err) {
-        res.status(400).json({error: err});
+        res.status(201).json(registeredLocker);
+    } catch (err) {
+        res.status(500).json({ error: "Erreur serveur lors de la création du casier." });
     }
-}
+};
 
 exports.getLockers = async (req, res) => {
     try{

@@ -38,6 +38,7 @@ const loadDataFixtures = async () => {
             password: 'admin',
             firstName: 'Admin',
             lastName: 'Admin',
+            role: 'Admin',
         },
     ];
 

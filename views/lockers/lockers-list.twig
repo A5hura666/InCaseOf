@@ -1,8 +1,19 @@
-{% extends 'layout.twig' %}
+{% extends "layout.twig" %}
 
 {% block body %}
     <div class="p-6 max-w-5xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6">Réservation de Casier</h1>
+        <div class="flex justify-between mb-6">
+            <h1 class="text-3xl font-bold">Réservation de Casier</h1>
+
+            {% if user and user["role"] == 'Admin' %}
+{#                <div class="text-right">#}
+{#                    <a href="/lockers/create" class="m-0 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ Ajouter un casier</a>#}
+{#                </div>#}
+                <button id="openModalBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    + Ajouter un casier
+                </button>
+            {% endif %}
+        </div>
 
         <div class="grid grid-cols-4 gap-4 mb-8">
             {% for locker in lockers %}
@@ -17,4 +28,80 @@
             {% endfor %}
         </div>
     </div>
+
+
+
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded shadow-md w-96 relative">
+            <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-black text-lg">&times;</button>
+            <h2 class="text-xl font-bold mb-4">Ajouter un Casier</h2>
+            <form id="createLockerForm">
+                <p id="formError" class="text-red-500 text-sm mb-4 hidden"></p>
+
+                <label class="block mb-2">Numéro du casier</label>
+                <input type="number" name="lockerNumber" class="w-full p-2 border rounded mb-4" required>
+
+                <label class="block mb-2">Taille</label>
+                <select name="lockerSize" class="w-full p-2 border rounded mb-4" required>
+                    <option value="small">Petit</option>
+                    <option value="medium">Moyen</option>
+                    <option value="large">Grand</option>
+                </select>
+
+                <label class="block mb-2">Prix (€)</label>
+                <input type="number" name="lockerPrice" step="0.01" class="w-full p-2 border rounded mb-4" required>
+
+                <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                    Créer
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const openModalBtn = document.getElementById('openModalBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const modal = document.getElementById('modal');
+            const form = document.getElementById('createLockerForm');
+            const errorParagraph = document.getElementById('formError');
+            errorParagraph.classList.add('hidden');
+            errorParagraph.textContent = '';
+
+            if (!openModalBtn || !closeModalBtn || !modal || !form) {
+                console.error('Éléments introuvables dans le DOM');
+                return;
+            }
+
+            openModalBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+            closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const data = {
+                    lockerNumber: form.lockerNumber.value,
+                    lockerSize: form.lockerSize.value,
+                    lockerPrice: form.lockerPrice.value
+                };
+
+                const res = await fetch('/api/lockers/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    modal.classList.add('hidden');
+                    location.reload();
+                } else {
+                    const err = await res.json();
+                    errorParagraph.textContent = err.error || 'Erreur inconnue';
+                    errorParagraph.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
 {% endblock %}

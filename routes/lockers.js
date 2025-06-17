@@ -12,4 +12,6 @@ router.put('/:id', lockerController.updateLocker);
 
 router.delete('/:id', lockerController.deleteLocker);
 
+router.post('/create', lockerController.postLocker);
+
 module.exports = router;

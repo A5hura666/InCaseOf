@@ -4,11 +4,13 @@ const lockerSchema = new mongoose.Schema({
   lockerNumber: {
     type: Number,
     unique: true,
+    required: true
   },
   lockerSize: {
     type: String,
     required: true,
     enum: ['small', 'medium', 'large'], // small, medium, large
+    trim: true,
   },
   lockerPrice: {
     type: Number,

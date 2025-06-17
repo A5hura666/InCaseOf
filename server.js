@@ -5,6 +5,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const addUserToLocals = require("./middlewares/addUserToLocals");
 
 dotenv.config();
 connectDB();
@@ -35,34 +36,12 @@ app.use(cookieParser());
 app.use('/api', limiter);
 app.use(cors());
 
+app.use(addUserToLocals);
+
 // Routes d'authentification
+app.use('/', require('./routes/index'));
 app.use('/auth', require('./routes/auth'));
 app.use('/lockers', require('./routes/lockers'));
-
-// ROUTES GO HERE
-app.get('/', (req, res) => {
-    const token = req.cookies.jwt;
-    let user = null;
-
-    if (token) {
-        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-            if (!err) {
-                user = {
-                    id: decoded.id,
-                    email: decoded.email,
-                    firstName: decoded.firstName,
-                    lastName: decoded.lastName,
-                    role: decoded.role
-                };
-            }
-        });
-    }
-    res.render('index', { title: 'Accueil', user });
-});
-
-app.get('/lockers/create', (req, res) => {
-    res.render('createLocker', { title: 'Créer un Casier' });
-});
 
 // Autres routes API
 app.use('/api/lockers', require('./routes/lockers'));

@@ -9,11 +9,11 @@ const bookingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Locker",
   },
-  bookingDate: {
+  startDate: {
     type: Date,
     default: Date.now,
   },
-  bookingDuration: {
+  endDate: {
     type: Date,
   },
 });

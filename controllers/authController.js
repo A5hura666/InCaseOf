@@ -23,7 +23,7 @@ exports.register = async (req, res) => {
                 formData: req.body
             });
         }
-        
+
         if (password.length < 8) {
             return res.status(400).render('authentification/register', {
                 title: 'Créer un compte',
@@ -182,6 +182,31 @@ exports.resetPassword = async (req, res) => {
         return res.status(400).render('authentification/reset-password', {
             token: req.params.token,
             error: 'Les mots de passe ne correspondent pas.'
+        });
+    }
+
+    if (req.body.password.length < 8) {
+        return res.status(400).render('authentification/reset-password', {
+            token: req.params.token,
+            error: 'Le mot de passe doit contenir au moins 8 caractères.'
+        });
+    }
+    if (!/[A-Z]/.test(req.body.password)) {
+        return res.status(400).render('authentification/reset-password', {
+            token: req.params.token,
+            error: 'Le mot de passe doit contenir au moins une majuscule.'
+        });
+    }
+    if (!/[0-9]/.test(req.body.password)) {
+        return res.status(400).render('authentification/reset-password', {
+            token: req.params.token,
+            error: 'Le mot de passe doit contenir au moins un chiffre.'
+        });
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(req.body.password)) {
+        return res.status(400).render('authentification/reset-password', {
+            token: req.params.token,
+            error: 'Le mot de passe doit contenir au moins un caractère spécial.'
         });
     }
 

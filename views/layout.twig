@@ -21,40 +21,67 @@
   </style>
 </head>
 <body class="bg-gray-100">
-<header class="bg-blue-600 text-white p-4">
-  <div class="container mx-auto flex justify-between items-center">
-    <h1 class="text-2xl font-bold">InCaseOf</h1>
-    <div class="flex items-center">
-        {% if user %}
-        <div class="flex items-center">
-          <span class="text-lg mr-2">{{ user.firstName }} {{ user.lastName }}</span>
-          <form action="/auth/logout" method="POST">
-            <button type="submit" class="bg-red-500 text-white rounded p-2">
-              <i class="fas fa-sign-out-alt"></i> Se déconnecter
-            </button>
-          </form>
+<header>
+    <div class="bg-white border-b border-gray-200">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-2 text-blue-600 font-bold text-xl">
+                <i class="fas fa-lock"></i>
+                <span>InCaseOf</span>
+            </a>
+
+            <nav class="flex items-center space-x-4">
+                {% if user %}
+                    <span class="text-gray-700 font-medium">{{ user.firstName }} {{ user.lastName }}</span>
+                    <form action="/auth/logout" method="POST">
+                        <button type="submit" class="text-red-500 hover:text-red-700 flex items-center space-x-1">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Se déconnecter</span>
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="/auth/login" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Connexion</span>
+                    </a>
+                    <a href="/auth/register" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
+                        <i class="fas fa-user-plus"></i> <span>Créer un compte</span>
+                    </a>
+                {% endif %}
+            </nav>
         </div>
-      {% else %}
-        <a href="/auth/login" class="bg-blue-500 text-white rounded p-2 mx-2">
-          <i class="fas fa-sign-in-alt"></i> Se connecter
-        </a>
-        <a href="/auth/register" class="bg-blue-500 text-white rounded p-2">
-          <i class="fas fa-user-plus"></i> Créer un compte
-        </a>
-      {% endif %}
     </div>
-  </div>
 </header>
 
-<main class="container mx-auto p-4">
+<main class="container mx-auto min-h-screen">
   {% block body %}{% endblock %}
 </main>
 
-<footer class="bg-blue-600 text-white p-4 mt-8">
-  <div class="container mx-auto text-center">
-    <p>&copy; 2025 Mon Application. Tous droits réservés.</p>
-  </div>
+<footer class="bg-gray-800 text-white">
+    <div class="container mx-auto px-4 py-8 grid justify-items-center grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+        <div>
+            <h3 class="text-lg font-semibold mb-2">InCaseOf</h3>
+            <p>Réservez, gérez et libérez vos casiers en ligne, simplement.</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold mb-2">Navigation</h3>
+            <ul class="space-y-1">
+                <li><a href="/" class="hover:underline">Accueil</a></li>
+                <li><a href="/lockers/list" class="hover:underline">Liste des casiers</a></li>
+                <li><a href="/auth/login" class="hover:underline">Connexion</a></li>
+                <li><a href="/auth/register" class="hover:underline">Inscription</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold mb-2">Contact</h3>
+            <p><i class="fas fa-envelope mr-1 mb-2"></i> contact@incaseof.app</p>
+            <p><i class="fas fa-phone mr-1"></i> +33 1 23 45 67 89</p>
+        </div>
+    </div>
+    <div class="text-center text-xs text-gray-400 border-t border-gray-700 py-4">
+        &copy; 2025 InCaseOf. Tous droits réservés.
+    </div>
 </footer>
+
 </body>
 
 {% block javascripts %}{% endblock %}

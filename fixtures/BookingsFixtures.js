@@ -22,19 +22,19 @@ const loadBookingsFixtures = async () => {
             user: users[0]._id,
             locker: lockers[0]._id,
             startDate: now,
-            endDate: now.setMonth(now.getMonth() + 1),
+            endDate: new Date().setMonth(now.getMonth() + 1),
         },
         {
             user: users[1]._id,
             locker: lockers[1]._id,
             startDate: now,
-            endDate: now.setDate(now.getDate() + 15),
+            endDate: new Date().setDate(now.getDate() + 15),
         },
         {
             user: users[2]._id,
             locker: lockers[2]._id,
             startDate: now,
-            endDate: now.setDate(now.getDate() + 24),
+            endDate: new Date().setMinutes(now.getMinutes() + 2),
         }
     ];
 

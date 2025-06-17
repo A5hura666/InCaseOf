@@ -17,11 +17,40 @@ exports.register = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).send('Cet utilisateur existe déjà.');
+            return res.status(400).render('authentification/register', {
+                title: 'Créer un compte',
+                error: 'Cet utilisateur existe déjà.',
+                formData: req.body
+            });
         }
-
-        if (!password || password.trim() === '') {
-            return res.status(400).send('Le mot de passe est requis.');
+        
+        if (password.length < 8) {
+            return res.status(400).render('authentification/register', {
+                title: 'Créer un compte',
+                error: 'Le mot de passe doit contenir au moins 8 caractères.',
+                formData: req.body
+            });
+        }
+        if (!/[A-Z]/.test(password)) {
+            return res.status(400).render('authentification/register', {
+                title: 'Créer un compte',
+                error: 'Le mot de passe doit contenir au moins une majuscule.',
+                formData: req.body
+            });
+        }
+        if (!/[0-9]/.test(password)) {
+            return res.status(400).render('authentification/register', {
+                title: 'Créer un compte',
+                error: 'Le mot de passe doit contenir au moins un chiffre.',
+                formData: req.body
+            });
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            return res.status(400).render('authentification/register', {
+                title: 'Créer un compte',
+                error: 'Le mot de passe doit contenir au moins un caractère spécial.',
+                formData: req.body
+            });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,10 +64,13 @@ exports.register = async (req, res) => {
         });
 
         await newUser.save();
-        res.redirect('/auth/login', { title: 'Connexion', error: null });
+        res.redirect('/auth/login');
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Erreur lors de la création de l\'utilisateur');
+        res.status(500).render('authentification/register', {
+            title: 'Créer un compte',
+            error: 'Erreur lors de la création de l\'utilisateur.',
+            formData: req.body
+        });
     }
 };
 

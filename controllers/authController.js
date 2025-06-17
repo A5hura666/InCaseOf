@@ -140,11 +140,17 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-        return res.status(400).send('Token invalide ou expiré.');
+        return res.status(400).render('authentification/reset-password', {
+            token: req.params.token,
+            error: 'Token invalide ou expiré.'
+        });
     }
 
     if (req.body.password !== req.body.passwordConfirm) {
-        return res.status(400).send('Les mots de passe ne correspondent pas.');
+        return res.status(400).render('authentification/reset-password', {
+            token: req.params.token,
+            error: 'Les mots de passe ne correspondent pas.'
+        });
     }
 
     user.password = await bcrypt.hash(req.body.password, 10);

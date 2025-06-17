@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
     host: "localhost",
-    port: 1025,
+    port: process.env.MAILHOG_SMTP_PORT,
     ignoreTLS: true
 });
 

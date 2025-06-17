@@ -15,6 +15,15 @@ services:
     networks:
       - mongo_network
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - ${MAILHOG_SMTP_PORT}:${MAILHOG_SMTP_PORT}
+      - ${MAILHOG_DEVUI_PORT}:${MAILHOG_DEVUI_PORT}
+    networks:
+      - mongo_network
+
 volumes:
   mongodb_data:
     driver: local

@@ -25,16 +25,32 @@
                                     style="    height: calc(300px + 1rem);"
                                 {% endif %}
                                 {% if user and user["role"] != 'Admin' %}
-                                    onclick='reserveLocker({{ cell.locker.id|json_encode }})'
+{#                                    onclick='reserveLocker({{ cell.locker.id|json_encode }})'#}
                                 {% endif %}
                         >
                             <h2 class="text-xl font-semibold mb-2">Casier #{{ cell.locker.lockerNumber }}</h2>
                             <p><strong>Taille:</strong> {{ cell.locker.lockerSize }}</p>
                             <p><strong>Prix:</strong> {{ cell.locker.lockerPrice }} €</p>
                             {% if user and user["role"] == 'Admin' %}
-                                <button onclick='reserveLocker({{ cell.locker.id|json_encode }})'
-                                        class="bg-blue-500 text-white rounded p-2 w-full hover:bg-blue-600">Réserver
-                                </button>
+                                <div class="absolute bottom-2 right-2 flex gap-3">
+{#                                    <button class="edit-btn bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-2 rounded text-sm flex items-center"#}
+{#                                            data-locker='{{ cell.locker | json_encode | e('html_attr') }}'>#}
+{#                                        <i data-lucide="pencil" class="w-6 h-6"></i>#}
+{#                                    </button>#}
+                                    <button class="edit-btn bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-2 rounded text-sm flex items-center"
+                                            data-id="{{ cell.locker._id }}"
+                                            data-locker-number="{{ cell.locker.lockerNumber }}"
+                                            data-locker-size="{{ cell.locker.lockerSize }}"
+                                            data-locker-price="{{ cell.locker.lockerPrice }}"
+                                            data-locker-status="{{ cell.locker.lockerStatus }}">
+                                        <i data-lucide="pencil" class="w-6 h-6"></i>
+                                    </button>
+
+                                    <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-2 py-2 rounded text-sm flex items-center"
+                                            data-id="{{ cell.locker.id }}">
+                                        <i data-lucide="trash-2" class="w-6 h-6"></i>
+                                    </button>
+                                </div>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -44,10 +60,36 @@
     </div>
 
 
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded shadow-md w-96 relative">
+            <button id="closeEditModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-black text-lg">&times;</button>
+            <h2 class="text-xl font-bold mb-4">Modifier le Casier</h2>
+            <form id="editLockerForm">
+                <input type="hidden" name="lockerId">
+                <label class="block mb-2">Numéro du casier</label>
+                <input type="number" name="lockerNumber" class="w-full p-2 border rounded mb-4" required>
+                <label class="block mb-2">Taille</label>
+                <select name="lockerSize" class="w-full p-2 border rounded mb-4" required>
+                    <option value="small">Petit</option>
+                    <option value="medium">Moyen</option>
+                    <option value="large">Grand</option>
+                </select>
+                <label class="block mb-2">Prix (€)</label>
+                <input type="number" name="lockerPrice" step="0.01" class="w-full p-2 border rounded mb-4" required>
 
+                <label class="block mb-2">Statut</label>
+                <select name="lockerStatus" class="w-full p-2 border rounded mb-4" required>
+                    <option value="free">Libre</option>
+                    <option value="booked">Réservé</option>
+                    <option value="blocked">Bloqué</option>
+                </select>
 
-
-
+                <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                    Modifier
+                </button>
+            </form>
+        </div>
+    </div>
 
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded shadow-md w-96 relative">
@@ -78,49 +120,144 @@
     </div>
 {% endblock %}
 
-{# {% block javascripts %} #}
-{#    <script> #}
-{#        window.addEventListener('DOMContentLoaded', () => { #}
-{#            const openModalBtn = document.getElementById('openModalBtn'); #}
-{#            const closeModalBtn = document.getElementById('closeModalBtn'); #}
-{#            const modal = document.getElementById('modal'); #}
-{#            const form = document.getElementById('createLockerForm'); #}
-{#            const errorParagraph = document.getElementById('formError'); #}
-{#            errorParagraph.classList.add('hidden'); #}
-{#            errorParagraph.textContent = ''; #}
+ {% block javascripts %}
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script src="https://unpkg.com/lucide@latest"></script>
+     <script>
+         window.addEventListener('DOMContentLoaded', () => {
+             lucide.createIcons();
 
-{#            if (!openModalBtn || !closeModalBtn || !modal || !form) { #}
-{#                console.error('Éléments introuvables dans le DOM'); #}
-{#                return; #}
-{#            } #}
+             const openModalBtn = document.getElementById('openModalBtn');
+             const closeModalBtn = document.getElementById('closeModalBtn');
+             const modal = document.getElementById('modal');
+             const form = document.getElementById('createLockerForm');
+             const errorParagraph = document.getElementById('formError');
 
-{#            openModalBtn.addEventListener('click', () => modal.classList.remove('hidden')); #}
-{#            closeModalBtn.addEventListener('click', () => modal.classList.add('hidden')); #}
+             const editModal = document.getElementById('editModal');
+             const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+             const editForm = document.getElementById('editLockerForm');
 
-{#            form.addEventListener('submit', async function (e) { #}
-{#                e.preventDefault(); #}
+             if (!openModalBtn || !closeModalBtn || !modal || !form || !editModal || !editForm || !closeEditModalBtn) {
+                 console.error('Éléments introuvables dans le DOM');
+                 return;
+             }
 
-{#                const data = { #}
-{#                    lockerNumber: form.lockerNumber.value, #}
-{#                    lockerSize: form.lockerSize.value, #}
-{#                    lockerPrice: form.lockerPrice.value #}
-{#                }; #}
+             errorParagraph.classList.add('hidden');
+             errorParagraph.textContent = '';
 
-{#                const res = await fetch('/api/lockers/create', { #}
-{#                    method: 'POST', #}
-{#                    headers: { 'Content-Type': 'application/json' }, #}
-{#                    body: JSON.stringify(data) #}
-{#                }); #}
+             openModalBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+             closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
-{#                if (res.ok) { #}
-{#                    modal.classList.add('hidden'); #}
-{#                    location.reload(); #}
-{#                } else { #}
-{#                    const err = await res.json(); #}
-{#                    errorParagraph.textContent = err.error || 'Erreur inconnue'; #}
-{#                    errorParagraph.classList.remove('hidden'); #}
-{#                } #}
-{#            }); #}
-{#        }); #}
-{#    </script> #}
-{# {% endblock %} #}
+             form.addEventListener('submit', async function (e) {
+                 e.preventDefault();
+                 const data = {
+                     lockerNumber: form.lockerNumber.value,
+                     lockerSize: form.lockerSize.value,
+                     lockerPrice: form.lockerPrice.value
+                 };
+
+                 const res = await fetch('/api/lockers/create', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(data)
+                 });
+
+                 if (res.ok) {
+                     modal.classList.add('hidden');
+                     location.reload();
+                 } else {
+                     const err = await res.json();
+                     errorParagraph.textContent = err.error || 'Erreur inconnue';
+                     errorParagraph.classList.remove('hidden');
+                 }
+             });
+
+             document.querySelectorAll('.delete-btn').forEach(btn => {
+                 btn.addEventListener('click', async () => {
+                     const lockerId = btn.dataset.id;
+
+                     const result = await Swal.fire({
+                         title: 'Supprimer ce casier ?',
+                         text: 'Cette action est irréversible.',
+                         icon: 'warning',
+                         showCancelButton: true,
+                         confirmButtonText: 'Oui, supprimer',
+                         cancelButtonText: 'Annuler'
+                     });
+
+                     if (result.isConfirmed) {
+                         const res = await fetch(`/api/lockers/${lockerId}`, {
+                             method: 'DELETE'
+                         });
+
+                         if (res.ok) {
+                            Swal.fire({
+                                title: 'Supprimé !',
+                                text: 'Le casier a été supprimé avec succès.',
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                                timer: 2000,
+                            })
+                             .then(() => {
+                                 location.reload();
+                             });
+                         }
+                         else Swal.fire({
+                                title: 'Erreur',
+                                text: 'La suppression a échoué.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                         });
+                     }
+                 });
+             });
+
+             document.querySelectorAll('.edit-btn').forEach(btn => {
+                 btn.addEventListener('click', () => {
+                     editForm.lockerId.value = btn.dataset.id;
+                     editForm.lockerNumber.value = btn.dataset.lockerNumber;
+                     editForm.lockerSize.value = btn.dataset.lockerSize;
+                     editForm.lockerPrice.value = btn.dataset.lockerPrice;
+                     editForm.lockerStatus.value = btn.dataset.lockerStatus;
+                     editModal.classList.remove('hidden');
+                 });
+             });
+
+             closeEditModalBtn.addEventListener('click', () => {
+                 editModal.classList.add('hidden');
+             });
+
+             editForm.addEventListener('submit', async e => {
+                 e.preventDefault();
+
+                 const lockerId = editForm.lockerId.value;
+                 const data = {
+                     lockerNumber: editForm.lockerNumber.value,
+                     lockerSize: editForm.lockerSize.value,
+                     lockerPrice: editForm.lockerPrice.value,
+                     lockerStatus: editForm.lockerStatus.value
+                 };
+
+                 const res = await fetch(`/api/lockers/${lockerId}`, {
+                     method: 'PUT',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify(data)
+                 });
+
+                 const result = await res.json();
+
+                 if (res.ok) {
+                     editModal.classList.add('hidden');
+                     location.reload();
+                 } else {
+                     Swal.fire({
+                         title: 'Erreur',
+                         text: result.error || 'La modification a échoué.',
+                         icon: 'error',
+                         confirmButtonText: 'OK'
+                     });
+                 }
+             });
+         });
+     </script>
+ {% endblock %}

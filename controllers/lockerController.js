@@ -55,6 +55,28 @@ exports.updateLocker = async (req, res) => {
     }
 }
 
+exports.updateLocker = async (req, res) => {
+    try {
+        const { lockerNumber } = req.body;
+        const lockerId = req.params.id;
+
+        const existingLocker = await Locker.findOne({
+            lockerNumber,
+            _id: { $ne: lockerId }
+        });
+
+        if (existingLocker) {
+            return res.status(400).json({ error: "Ce numéro de casier est déjà utilisé." });
+        }
+
+        const updatedLocker = await Locker.findByIdAndUpdate(lockerId, req.body, { new: true });
+
+        res.status(200).json(updatedLocker);
+    } catch (err) {
+        res.status(400).json({ error: err.message || 'Erreur serveur' });
+    }
+};
+
 exports.deleteLocker = async (req, res) => {
     try{
         const deletedLocker = await Locker.findByIdAndDelete(req.params.id);

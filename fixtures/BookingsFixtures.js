@@ -15,24 +15,26 @@ const loadBookingsFixtures = async () => {
         console.log('no user or locker found (user = ' + users.length + ', locker = ' + lockers.length + ')');
     }
 
+    const now = new Date();
+
     const bookings = [
         {
             user: users[0]._id,
             locker: lockers[0]._id,
-            bookingDate: new Date(),
-            bookingDuration: 1
+            startDate: now,
+            endDate: now.setMonth(now.getMonth() + 1),
         },
         {
             user: users[1]._id,
             locker: lockers[1]._id,
-            bookingDate: new Date(),
-            bookingDuration: 1,
+            startDate: now,
+            endDate: now.setDate(now.getDate() + 15),
         },
         {
             user: users[2]._id,
             locker: lockers[2]._id,
-            bookingDate: new Date(),
-            bookingDuration: 1,
+            startDate: now,
+            endDate: now.setDate(now.getDate() + 24),
         }
     ];
 

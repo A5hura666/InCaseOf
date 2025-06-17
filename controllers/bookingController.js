@@ -28,10 +28,19 @@ exports.postBooking = async (req, res) => {
     }
 }
 
+exports.getBookingByLockerId = async (req, res) => {
+    try {
+        const booking = await Bookings.find({locker: req.params.lockerNumber});
+        res.status(200).json(booking);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+
 exports.getBookingById = async (req, res) => {
     try {
-        const fleur = await Bookings.findById(req.params.id);
-        res.status(200).json(fleur);
+        const booking = await Bookings.findById(req.params.id);
+        res.status(200).json(booking);
     } catch (err) {
         res.status(400).json({ error: err });
     }

@@ -37,6 +37,15 @@ exports.getBookingByLockerId = async (req, res) => {
     }
 }
 
+exports.getBookingsByUserId = async (req, res) => {
+    try {
+        const bookings = await Bookings.find({user: req.params.id});
+        res.status(200).json(bookings);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+
 exports.getBookingById = async (req, res) => {
     try {
         const booking = await Bookings.findById(req.params.id);

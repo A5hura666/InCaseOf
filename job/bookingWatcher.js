@@ -6,7 +6,7 @@ const {join} = require("node:path");
 const sendEmail = require("../utils/mailer");
 
 async function checkBookingToRemindUser() {
-    console.log("Checking Booking : reminder");
+    //console.log("Checking Booking : reminder");
     const now = new Date();
 
     try {
@@ -18,22 +18,25 @@ async function checkBookingToRemindUser() {
             minute: "numeric",
             second: "numeric",
         };
-        const lowerBound = new Date(new Date().setMinutes(now.getMinutes() + 31));
-        const upperBound = new Date(new Date().setMinutes(now.getMinutes() + 30));
+        const lowerBound = new Date(new Date().setMinutes(now.getMinutes() + 30));
+        const upperBound = new Date(new Date().setMinutes(now.getMinutes() + 31));
 
-        console.log("Checking Booking between " + lowerBound.toLocaleDateString("fr-FR", options) + " and " + upperBound.toLocaleDateString("fr-FR", options));
+        //console.log("Checking Booking between " + lowerBound.toLocaleDateString("fr-FR", options) + " and " + upperBound.toLocaleDateString("fr-FR", options));
 
         const bookingsToRemind = await Booking.find({
             endDate: {$gt: lowerBound, $lte: upperBound}
         });
 
-        console.log("bookingsToRemind: ", bookingsToRemind);
+        //console.log("bookingsToRemind: ", bookingsToRemind);
 
         for (const booking of bookingsToRemind) {
             const user = await User.findById(booking.user);
             const locker = await Locker.findById(booking.locker)
 
-            const emailTemplatePath = join(__dirname, '..', 'views', 'emails', 'reminder-expiration');
+            //console.log("user: ", user);
+            //console.log("locker: ", locker);
+
+            const emailTemplatePath = join(__dirname, '..', 'views', 'emails', 'reminder-expiration.html');
             let emailHTML = readFileSync(emailTemplatePath, 'utf8');
             emailHTML = emailHTML.replace('{{userName}}', user.firstName).replace('{{lockerNumber}}', locker.lockerNumber);
 
@@ -46,7 +49,7 @@ async function checkBookingToRemindUser() {
             console.log('Sent reminder email to ', user.firstName);
         }
     } catch (err) {
-        console.error(err);
+        console.error('Error checking booking reminder: ', err);
     }
 }
 
@@ -67,7 +70,7 @@ async function checkExpiredBookings() {
             await booking.deleteOne();
         }
     } catch (err) {
-        console.error('Error checking expired bookings:', err);
+        console.error('Error checking expired bookings: ', err);
     }
 }
 

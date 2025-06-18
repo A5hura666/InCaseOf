@@ -16,6 +16,4 @@ router.delete('/:id', lockerController.deleteLocker);
 
 router.post('/create', lockerController.postLocker);
 
-router.post('/reserve', (booking.postBooking));
-
 module.exports = router;

@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Bookings = require('../models/Booking');
+
 
 exports.postUser = async (req, res) => {
     try{
@@ -33,6 +35,15 @@ exports.updateUser = async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate
         (req.params.id, req.body, {new: true});
         res.status(200).json(updatedUser);
+    }catch (err) {
+        res.status(400).json({error: err});
+    }
+}
+
+exports.getBookingsByUserId = async (req, res) => {
+    try{
+        const bookings = await Bookings.find({user: req.params.id}).populate('locker', 'lockerNumber lockerSize');
+        res.render('bookings', {bookings: bookings});
     }catch (err) {
         res.status(400).json({error: err});
     }

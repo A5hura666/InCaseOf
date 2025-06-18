@@ -1,0 +1,64 @@
+{% extends "layout.twig" %}
+
+{% block body %}
+    <div class="p-6 max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Liste des Rendez-vous</h1>
+
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+            <tr class="bg-gray-100">
+                <th class="border p-2">Casier</th>
+                <th class="border p-2">Date de début</th>
+                <th class="border p-2">Date de fin</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for appointment in bookings %}
+                <tr>
+                    <td class="border p-2">{{ appointment.locker.lockerNumber }}</td>
+                    <td class="border p-2">{{ appointment.startDate|date("d/m/Y H:i") }}</td>
+                    <td class="border p-2">{{ appointment.endDate|date("d/m/Y H:i") }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="border p-4 text-center text-gray-500">Aucun rendez-vous enregistré.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+ {% block javascripts %}
+     <script>
+         async function bookAppointment() {
+             const urlString = window.location.href;
+             const url = new URL(urlString);
+
+             const userId = {{ user.id|json_encode|raw }};
+             const lockerId = url.searchParams.get('lockerId');
+             const duration = url.searchParams.get('duration');
+
+             const data = {
+                 user: userId,
+                 lockerId: lockerId,
+                 startDate: new Date().toISOString(),
+                 endDate: new Date(Date.now() + duration * 60 * 60 * 1000).toISOString()
+             };
+
+             const res = await fetch('/api/bookings', {
+                 method: 'POST',
+                 headers: {'Content-Type': 'application/json'},
+                 body: JSON.stringify(data)
+             });
+
+             if (res.ok) {
+                 window.location.href = '/users/' + userId + '/bookings';
+             }
+         }
+
+         // Appeler la fonction si besoin
+         bookAppointment();
+     </script>
+
+ {% endblock %}

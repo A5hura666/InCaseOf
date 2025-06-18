@@ -1,6 +1,6 @@
 const Bookings = require("../models/Booking");
-const {LockerManager} = require("../manager/LockerManager");
-
+const Locker = require("../models/Locker");
+const User = require("../models/User");
 
 exports.getBookings = async (req, res) => {
     try {
@@ -13,20 +13,31 @@ exports.getBookings = async (req, res) => {
 
 exports.postBooking = async (req, res) => {
     try {
-        const lockerBooked = LockerManager.findLockerById(req.body.lockerId);
-        if (lockerBooked && lockerBooked.lockerStatus === 1) {
-            const newBookings = new Bookings(req.body);
+        const lockerBooked = await Locker.findOne({ _id: req.body.lockerId });
+        const user = await User.findOne({ _id: req.body.user });
+        if (lockerBooked && user) {
+            const newBookings = new Bookings({
+                locker: lockerBooked._id,
+                user: user._id,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
+            });
+
             const registeredBookings = await newBookings.save();
+
             lockerBooked.lockerStatus = "booked";
-            lockerBooked.save();
+            await lockerBooked.save(); // attention : await sinon non bloquant
+
             res.status(201).json(registeredBookings);
         } else {
-            res.status(400).json({ error: "Locker not available" });
+            res.status(400).json({ error: "Locker or user not found" });
         }
     } catch (err) {
-        res.status(400).json({ error: err });
+        console.error("Error creating booking:", err);
+        res.status(400).json({ error: err.message });
     }
-}
+};
+
 
 exports.getBookingByLockerId = async (req, res) => {
     try {

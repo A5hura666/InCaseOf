@@ -41,12 +41,14 @@ app.use(addUserToLocals);
 app.use('/', require('./routes/index'));
 app.use('/auth', require('./routes/auth'));
 app.use('/lockers', require('./routes/lockers'));
+app.use('/payment', require('./routes/stripe'));
+app.use('/bookings', require('./routes/bookings'));
+app.use('/users', require('./routes/users'));
 
 // Autres routes API
 app.use('/api/lockers', require('./routes/lockers'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/users', require('./routes/users'));
-
 
 // Démarrage du serveur
 const PORT = process.env.PORT || 3000;

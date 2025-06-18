@@ -28,7 +28,7 @@ const loadBookingsFixtures = async () => {
             user: users[1]._id,
             locker: lockers[1]._id,
             startDate: now,
-            endDate: new Date().setMinutes(now.getMinutes() + 33),
+            endDate: new Date().setMinutes(now.getMinutes() + 31),
         },
         {
             user: users[2]._id,

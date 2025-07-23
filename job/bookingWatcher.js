@@ -5,7 +5,7 @@ const {readFileSync} = require("node:fs");
 const {join} = require("node:path");
 const sendEmail = require("../utils/mailer");
 
-async function checkBookingToRemindUser() {
+async function checkBookingToRemindUser(reminderDurationMinutes, intervalMs) {
     //console.log("Checking Booking : reminder");
     const now = new Date();
 
@@ -18,8 +18,8 @@ async function checkBookingToRemindUser() {
             minute: "numeric",
             second: "numeric",
         };
-        const lowerBound = new Date(new Date().setMinutes(now.getMinutes() + 30));
-        const upperBound = new Date(new Date().setMinutes(now.getMinutes() + 31));
+        const lowerBound = new Date(new Date().setMinutes(now.getMinutes() + reminderDurationMinutes));
+        const upperBound = new Date(new Date().setMinutes(now.getMinutes() + reminderDurationMinutes + Math.floor(intervalMs/1000)));
 
         //console.log("Checking Booking between " + lowerBound.toLocaleDateString("fr-FR", options) + " and " + upperBound.toLocaleDateString("fr-FR", options));
 
@@ -38,7 +38,9 @@ async function checkBookingToRemindUser() {
 
             const emailTemplatePath = join(__dirname, '..', 'views', 'emails', 'reminder-expiration.html');
             let emailHTML = readFileSync(emailTemplatePath, 'utf8');
-            emailHTML = emailHTML.replace('{{userName}}', user.firstName).replace('{{lockerNumber}}', locker.lockerNumber);
+            emailHTML = emailHTML.replace('{{userName}}', user.firstName)
+                .replace('{{lockerNumber}}', locker.lockerNumber)
+                .replace('{{reminderTimeMinutes}}', reminderDurationMinutes);
 
             await sendEmail({
                 to: user.email,
@@ -74,9 +76,9 @@ async function checkExpiredBookings() {
     }
 }
 
-module.exports = function startBookingWatcher(intervalMs = 60 * 1000) {
+module.exports = function startBookingWatcher(reminderDurationMinutes = 30, intervalMs = 60 * 1000) {
     checkExpiredBookings();
-    checkBookingToRemindUser();
+    checkBookingToRemindUser(reminderDurationMinutes, intervalMs);
     setInterval(checkExpiredBookings, intervalMs);
-    setInterval(checkBookingToRemindUser, intervalMs);
+    setInterval(checkBookingToRemindUser, intervalMs, [reminderDurationMinutes, intervalMs]);
 };

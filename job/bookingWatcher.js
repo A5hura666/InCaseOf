@@ -46,15 +46,17 @@ async function checkExpiredBookings() {
 
     try {
         const expiredBookings = await Booking.find({
-            endDate: {$lte: now}
+            endDate: { $lte: now }
         });
 
         for (const booking of expiredBookings) {
-            await Locker.findByIdAndUpdate(booking.locker, {lockerStatus: "free"});
+            // Libérer le casier
+            await Locker.findByIdAndUpdate(booking.locker, { lockerStatus: "free" });
 
-            console.log(`Booking ${booking._id} expired and locker ${booking.locker} released`);
+            // Mettre à jour le statut du booking
+            await Booking.findByIdAndUpdate(booking._id, { status: "closed" });
 
-            await booking.deleteOne();
+            console.log(`Booking ${booking._id} expired, status updated to 'closed', and locker ${booking.locker} released`);
         }
     } catch (err) {
         console.error('Error checking expired bookings: ', err);

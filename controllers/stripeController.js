@@ -21,7 +21,7 @@ exports.postIntentPayment = async (req, res) => {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.BASE_URL}/users/${req.body.userId}/bookings?lockerId=${req.body.lockerId}&duration=${req.body.duration}`,
+            success_url: `${process.env.BASE_URL}/users/${req.body.userId}/bookings?lockerId=${req.body.lockerId}&duration=${req.body.duration}&totalPrice=${lockerSelected.lockerPrice * parseInt(req.body.duration)}`,
             cancel_url: `${process.env.BASE_URL}/lockers/list`,
         });
         res.status(200).json({ url: session.url });

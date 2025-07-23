@@ -7,11 +7,10 @@
         {% if bookings|length > 0 %}
             <div class="relative border-l-2 pl-2 border-gray-300">
                 {% for appointment in bookings %}
-                    {% set status = appointment.locker.lockerStatus %}
+                    {% set status = appointment.status %}
                     {% set statusColor = {
-                        'booked': 'bg-yellow-100 text-yellow-800 border-yellow-300',
-                        'free': 'bg-green-100 text-green-800 border-green-300',
-                        'blocked': 'bg-red-100 text-red-800 border-red-300'
+                        'closed': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                        'progress': 'bg-green-100 text-green-800 border-green-300',
                     }[status] %}
                     <div class="mb-10 ml-6 group relative">
                         <span class="absolute -left-3.5 flex items-center justify-center w-7 h-7 bg-indigo-600 rounded-full ring-8 ring-white transition-all duration-300 group-hover:scale-110">
@@ -21,9 +20,12 @@
                             <div class="flex justify-between items-start">
                                 <h3 class="text-xl font-semibold text-indigo-700">Casier n°{{ appointment.locker.lockerNumber }}</h3>
                                 <span class="text-sm border px-2 py-1 rounded-full font-medium {{ statusColor }}">
-                                    {% if status == 'booked' %} Réservé
-                                    {% elseif status == 'free' %} Libre
-                                    {% elseif status == 'blocked' %} Bloqué
+                                    {% if status == 'closed' %}
+                                        Réservation terminée
+                                    {% elseif status == 'progress' %}
+                                        En cours
+                                    {% else %}
+                                        Statut inconnu
                                     {% endif %}
                                 </span>
                             </div>
@@ -60,7 +62,10 @@
 {% block javascripts %}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+
+
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
         });
@@ -72,14 +77,16 @@
             const userId = {{ user.id|json_encode|raw }};
             const lockerId = url.searchParams.get('lockerId');
             const duration = url.searchParams.get('duration');
+            const totalPrice = url.searchParams.get('totalPrice');
 
-            if (!lockerId || !duration) return;
+            if (!lockerId || !duration || !totalPrice) return;
 
             const data = {
                 user: userId,
                 lockerId: lockerId,
                 startDate: new Date().toISOString(),
-                endDate: new Date(Date.now() + duration * 60 * 60 * 1000).toISOString()
+                endDate: new Date(Date.now() + duration * 60 * 60 * 1000).toISOString(),
+                totalPrice: totalPrice,
             };
 
             const res = await fetch('/api/bookings', {
@@ -94,15 +101,52 @@
         }
 
         async function downloadInvoice(bookingId) {
-            await Swal.fire({
-                title: "Génération en cours",
-                text: `La facture pour la réservation #${bookingId} est en cours de préparation.`,
-                icon: "info",
-                showConfirmButton: false,
-                timer: 2000
-            });
+            console.log("Téléchargement de la facture pour la réservation ID:", bookingId);
 
-            // TODO: remplacer ce comportement fictif par une vraie génération PDF plus tard
+            try {
+                const response = await fetch(`/api/bookings/${bookingId}/invoice`);
+                if (!response.ok) throw new Error("Erreur lors de la récupération de la facture");
+
+                const data = await response.json();
+
+                const {
+                    user,
+                    locker,
+                    startDate,
+                    endDate,
+                    totalPrice,
+                    _id
+                } = data;
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFontSize(18);
+                doc.text("Facture de Réservation", 20, 20);
+
+                doc.setFontSize(12);
+                doc.text(`Numéro de réservation : ${_id}`, 20, 35);
+                doc.text(`Nom du client : ${user.firstName} ${user.lastName}`, 20, 45);
+                doc.text(`Email : ${user.email}`, 20, 55);
+
+                doc.text(`Casier réservé : N°${locker.lockerNumber}`, 20, 70);
+                doc.text(`Taille du casier : ${locker.lockerSize}`, 20, 80);
+
+                doc.text(`Date de début : ${new Date(startDate).toLocaleString('fr-FR')}`, 20, 95);
+                doc.text(`Date de fin : ${new Date(endDate).toLocaleString('fr-FR')}`, 20, 105);
+
+                doc.setFontSize(14);
+                doc.text(`Prix total : ${totalPrice} €`, 20, 120);
+
+                doc.save(`facture_${_id}.pdf`);
+
+            } catch (error) {
+                Swal.fire({
+                    title: "Erreur",
+                    text: error.message,
+                    icon: "error"
+                });
+            }
         }
 
         bookAppointment();

@@ -21,6 +21,8 @@ exports.postBooking = async (req, res) => {
                 user: user._id,
                 startDate: req.body.startDate,
                 endDate: req.body.endDate,
+                totalPrice: req.body.totalPrice,
+                lockerSize: lockerBooked.lockerSize,
             });
 
             const registeredBookings = await newBookings.save();
@@ -83,6 +85,22 @@ exports.deleteBooking = async (req, res) => {
     try {
         const deletedBookings = await Bookings.findByIdAndDelete(req.params.id);
         res.status(200).json(deletedBookings);
+    } catch (err) {
+        res.status(400).json({ error: err });
+    }
+}
+
+exports.getBookingInvoice = async (req, res) => {
+    try {
+        const booking = await Bookings.findById(req.params.id)
+            .populate('user', 'firstName lastName email')
+            .populate('locker', 'lockerNumber lockerSize');
+
+        if (!booking) {
+            return res.status(404).json({ error: "Booking not found" });
+        }
+
+        res.status(200).json(booking);
     } catch (err) {
         res.status(400).json({ error: err });
     }

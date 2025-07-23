@@ -3,17 +3,18 @@ const jwt = require('../utils/jwt'); // Assuming you have a JWT middleware for a
 const router = express.Router();
 const booking = require('../controllers/bookingController'); // Assuming you have a booking controller
 const lockerController = require('../controllers/lockerController');
+const verifyToken = require("../middlewares/authController");
 
-router.post('/', lockerController.postLocker);
+router.post('/', verifyToken, lockerController.postLocker);
 
 router.get('/list', lockerController.getLockers);
 
-router.get('/:id', lockerController.getLockerById);
+router.get('/:id', verifyToken, lockerController.getLockerById);
 
-router.put('/:id', lockerController.updateLocker);
+router.put('/:id', verifyToken, lockerController.updateLocker);
 
-router.delete('/:id', lockerController.deleteLocker);
+router.delete('/:id', verifyToken, lockerController.deleteLocker);
 
-router.post('/create', lockerController.postLocker);
+router.post('/create', verifyToken, lockerController.postLocker);
 
 module.exports = router;

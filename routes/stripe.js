@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const Stripe = require('stripe');
 const bodyParser = require('body-parser');
 const stripeController = require('../controllers/stripeController');
+const verifyToken = require("../middlewares/authController");
 
 dotenv.config();
 const app = express();
@@ -12,7 +13,7 @@ const port = 4242;
 app.use(bodyParser.json());
 
 /* GET home page. */
-router.get('/', function(req, res)  {
+router.get('/', verifyToken, function(req, res)  {
     res.render('stripe', { title: 'Paiement de la réservation', api_secret_key: process.env.PRIVATE_STRIPE_API_KEY, api_publishable_key: process.env.PUBLIC_STRIPE_API_KEY });
 });
 

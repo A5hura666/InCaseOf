@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const bookingController = require("../controllers/bookingController");
 const verifyToken = require("../middlewares/authController");
+const {restrictTo} = require("../utils/jwt");
 
 router.post("/", verifyToken, bookingController.postBooking);
 
-router.get("/", verifyToken, bookingController.getBookings);
+router.get("/", verifyToken, restrictTo('Admin'), bookingController.getBookings);
 
 router.get("/:id", verifyToken, bookingController.getBookingById);
 

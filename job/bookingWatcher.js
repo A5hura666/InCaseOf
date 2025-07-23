@@ -13,7 +13,7 @@ async function checkBookingToRemindUser(reminderDurationMinutes, intervalMs) {
         const upperBound = new Date(new Date().setMinutes(now.getMinutes() + reminderDurationMinutes + Math.floor(intervalMs/60000)));
 
         const bookingsToRemind = await Booking.find({
-            endDate: {$gt: lowerBound, $lte: upperBound}
+            endDate: {$gt: lowerBound, $lte: upperBound}, status: { $ne: "closed" }
         });
 
 
@@ -46,7 +46,7 @@ async function checkExpiredBookings() {
 
     try {
         const expiredBookings = await Booking.find({
-            endDate: { $lte: now }
+            endDate: { $lte: now }, status: { $ne: "closed" }
         });
 
         for (const booking of expiredBookings) {

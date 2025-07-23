@@ -42,7 +42,7 @@ exports.updateUser = async (req, res) => {
 
 exports.getBookingsByUserId = async (req, res) => {
     try{
-        const bookings = await Bookings.find({user: req.params.id}).populate('locker');
+        const bookings = await Bookings.find({user: req.params.id}).populate('locker').populate('user', 'firstName lastName email');
         res.render('bookings', {bookings: bookings});
     }catch (err) {
         res.status(400).json({error: err});

@@ -14,7 +14,7 @@
                     }[status] %}
                     <div class="mb-10 ml-6 group relative">
                         <span class="absolute -left-3.5 flex items-center justify-center w-7 h-7 bg-indigo-600 rounded-full ring-8 ring-white transition-all duration-300 group-hover:scale-110">
-                           <svg data-lucide="package" class="w-4 h-4 text-white"></svg>
+                            <svg data-lucide="package" class="w-4 h-4 text-white"></svg>
                         </span>
                         <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 transition duration-300 hover:shadow-lg">
                             <div class="flex justify-between items-start">
@@ -30,18 +30,40 @@
                                 </span>
                             </div>
 
-                            <div class="text-gray-600 mt-2 space-y-1">
-                                <p class="flex items-center gap-2">
-                                    <svg data-lucide="calendar" class="w-4 h-4 text-gray-500"></svg>
-                                    Du {{ appointment.startDate|date("d/m/Y H:i") }}
-                                </p>
-                                <p class="flex items-center gap-2">
-                                    <svg data-lucide="user" class="w-4 h-4 text-gray-500"></svg>
-                                    au {{ appointment.endDate|date("d/m/Y H:i") }}
-                                </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600 mt-4">
+                                <div class="space-y-1">
+                                    {% if appointment.user %}
+                                        <p class="flex items-center gap-2">
+                                            <svg data-lucide="user-round" class="w-4 h-4 text-gray-500"></svg>
+                                            Client : <strong>{{ appointment.user.firstName }} {{ appointment.user.lastName }}</strong>
+                                        </p>
+                                        <p class="flex items-center gap-2">
+                                            <svg data-lucide="mail" class="w-4 h-4 text-gray-500"></svg>
+                                            Email : <strong>{{ appointment.user.email }}</strong>
+                                        </p>
+                                    {% endif %}
+                                    <p class="flex items-center gap-2">
+                                        <svg data-lucide="ruler" class="w-4 h-4 text-gray-500"></svg>
+                                        Taille du casier : <strong>{{ appointment.locker.lockerSize|capitalize }}</strong>
+                                    </p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="flex items-center gap-2">
+                                        <svg data-lucide="calendar" class="w-4 h-4 text-gray-500"></svg>
+                                        Du <strong>{{ appointment.startDate|date("d/m/Y H:i") }}</strong>
+                                    </p>
+                                    <p class="flex items-center gap-2">
+                                        <svg data-lucide="calendar-clock" class="w-4 h-4 text-gray-500"></svg>
+                                        Au <strong>{{ appointment.endDate|date("d/m/Y H:i") }}</strong>
+                                    </p>
+                                    <p class="flex items-center gap-2">
+                                        <svg data-lucide="euro" class="w-4 h-4 text-gray-500"></svg>
+                                        Prix total : <strong>{{ appointment.totalPrice }} €</strong>
+                                    </p>
+                                </div>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-5">
                                 <button onclick="downloadInvoice('{{ appointment._id }}')" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition">
                                     Télécharger la facture
                                 </button>
@@ -58,6 +80,7 @@
         {% endif %}
     </div>
 {% endblock %}
+
 
 {% block javascripts %}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

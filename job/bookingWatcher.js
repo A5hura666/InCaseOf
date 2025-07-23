@@ -5,40 +5,28 @@ const {readFileSync} = require("node:fs");
 const {join} = require("node:path");
 const sendEmail = require("../utils/mailer");
 
-async function checkBookingToRemindUser() {
-    //console.log("Checking Booking : reminder");
+async function checkBookingToRemindUser(reminderDurationMinutes, intervalMs) {
     const now = new Date();
 
     try {
-        let options = {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric",
-        };
-        const lowerBound = new Date(new Date().setMinutes(now.getMinutes() + 30));
-        const upperBound = new Date(new Date().setMinutes(now.getMinutes() + 31));
-
-        //console.log("Checking Booking between " + lowerBound.toLocaleDateString("fr-FR", options) + " and " + upperBound.toLocaleDateString("fr-FR", options));
+        const lowerBound = new Date(new Date().setMinutes(now.getMinutes() + reminderDurationMinutes));
+        const upperBound = new Date(new Date().setMinutes(now.getMinutes() + reminderDurationMinutes + Math.floor(intervalMs/60000)));
 
         const bookingsToRemind = await Booking.find({
             endDate: {$gt: lowerBound, $lte: upperBound}
         });
 
-        //console.log("bookingsToRemind: ", bookingsToRemind);
 
         for (const booking of bookingsToRemind) {
             const user = await User.findById(booking.user);
             const locker = await Locker.findById(booking.locker)
 
-            //console.log("user: ", user);
-            //console.log("locker: ", locker);
 
             const emailTemplatePath = join(__dirname, '..', 'views', 'emails', 'reminder-expiration.html');
             let emailHTML = readFileSync(emailTemplatePath, 'utf8');
-            emailHTML = emailHTML.replace('{{userName}}', user.firstName).replace('{{lockerNumber}}', locker.lockerNumber);
+            emailHTML = emailHTML.replace('{{userName}}', user.firstName)
+                .replace('{{lockerNumber}}', locker.lockerNumber)
+                .replace('{{reminderTimeMinutes}}', reminderDurationMinutes);
 
             await sendEmail({
                 to: user.email,
@@ -54,7 +42,6 @@ async function checkBookingToRemindUser() {
 }
 
 async function checkExpiredBookings() {
-    console.log("Checking Booking : expiration");
     const now = new Date();
 
     try {
@@ -74,9 +61,9 @@ async function checkExpiredBookings() {
     }
 }
 
-module.exports = function startBookingWatcher(intervalMs = 60 * 1000) {
+module.exports = function startBookingWatcher(reminderDurationMinutes = 30, intervalMs = 60 * 1000) {
     checkExpiredBookings();
-    checkBookingToRemindUser();
+    checkBookingToRemindUser(reminderDurationMinutes, intervalMs);
     setInterval(checkExpiredBookings, intervalMs);
-    setInterval(checkBookingToRemindUser, intervalMs);
+    setInterval(checkBookingToRemindUser, intervalMs, reminderDurationMinutes, intervalMs);
 };

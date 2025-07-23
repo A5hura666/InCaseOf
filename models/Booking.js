@@ -16,19 +16,19 @@ const bookingSchema = new mongoose.Schema({
   endDate: {
     type: Date,
   },
-    totalPrice: {
-        type: Number,
-    },
-    status: {
-        type: String,
-        enum: ["progress", "closed"],
-        default: "progress",
-    },
-    lockerSize: {
-        type: String,
-        enum: ["small", "medium", "large"],
-        required: true,
-    }
+  totalPrice: {
+      type: Number,
+  },
+  status: {
+      type: String,
+      enum: ["progress", "closed"],
+      default: "progress",
+  },
+  lockerSize: {
+      type: String,
+      enum: ["small", "medium", "large"],
+      required: true,
+  }
 });
 
 

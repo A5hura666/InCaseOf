@@ -19,22 +19,40 @@ const loadBookingsFixtures = async () => {
 
     const bookings = [
         {
+            user: users[1]._id,
+            locker: lockers[2]._id,
+            startDate: new Date().setHours(now.getHours() - 5),
+            endDate: new Date().setHours(now.getHours() - 2),
+            totalPrice: 40,
+            status: "closed",
+            lockerSize: "small"
+        },
+        {
             user: users[0]._id,
             locker: lockers[0]._id,
             startDate: now,
             endDate: new Date().setMinutes(now.getMinutes() + 45),
+            totalPrice: 200,
+            status: "progress",
+            lockerSize: "large"
         },
         {
             user: users[1]._id,
             locker: lockers[1]._id,
             startDate: now,
             endDate: new Date().setMinutes(now.getMinutes() + 31),
+            totalPrice: 160,
+            status: "progress",
+            lockerSize: "medium"
         },
         {
             user: users[2]._id,
             locker: lockers[2]._id,
             startDate: now,
             endDate: new Date().setMinutes(now.getMinutes() + 2),
+            totalPrice: 70,
+            status: "progress",
+            lockerSize: "small"
         }
     ];
 

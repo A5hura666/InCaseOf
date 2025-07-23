@@ -4,8 +4,8 @@ const User = require("../models/User");
 
 exports.getBookings = async (req, res) => {
     try {
-        const fleurs = await Bookings.find();
-        res.status(200).json(fleurs);
+        const bookings = await Bookings.find();
+        res.status(200).json(bookings);
     } catch (err) {
         res.status(400).json({ error: err });
     }

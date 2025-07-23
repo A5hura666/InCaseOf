@@ -1,64 +1,110 @@
 {% extends "layout.twig" %}
 
 {% block body %}
-    <div class="p-6 max-w-5xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6">Liste des Rendez-vous</h1>
+    <div class="p-6 max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Historique de Réservation</h1>
 
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-            <tr class="bg-gray-100">
-                <th class="border p-2">Casier</th>
-                <th class="border p-2">Date de début</th>
-                <th class="border p-2">Date de fin</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for appointment in bookings %}
-                <tr>
-                    <td class="border p-2">{{ appointment.locker.lockerNumber }}</td>
-                    <td class="border p-2">{{ appointment.startDate|date("d/m/Y H:i") }}</td>
-                    <td class="border p-2">{{ appointment.endDate|date("d/m/Y H:i") }}</td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="4" class="border p-4 text-center text-gray-500">Aucun rendez-vous enregistré.</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% if bookings|length > 0 %}
+            <div class="relative border-l-2 pl-2 border-gray-300">
+                {% for appointment in bookings %}
+                    {% set status = appointment.locker.lockerStatus %}
+                    {% set statusColor = {
+                        'booked': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                        'free': 'bg-green-100 text-green-800 border-green-300',
+                        'blocked': 'bg-red-100 text-red-800 border-red-300'
+                    }[status] %}
+                    <div class="mb-10 ml-6 group relative">
+                        <span class="absolute -left-3.5 flex items-center justify-center w-7 h-7 bg-indigo-600 rounded-full ring-8 ring-white transition-all duration-300 group-hover:scale-110">
+                           <svg data-lucide="package" class="w-4 h-4 text-white"></svg>
+                        </span>
+                        <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 transition duration-300 hover:shadow-lg">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-xl font-semibold text-indigo-700">Casier n°{{ appointment.locker.lockerNumber }}</h3>
+                                <span class="text-sm border px-2 py-1 rounded-full font-medium {{ statusColor }}">
+                                    {% if status == 'booked' %} Réservé
+                                    {% elseif status == 'free' %} Libre
+                                    {% elseif status == 'blocked' %} Bloqué
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <div class="text-gray-600 mt-2 space-y-1">
+                                <p class="flex items-center gap-2">
+                                    <svg data-lucide="calendar" class="w-4 h-4 text-gray-500"></svg>
+                                    Du {{ appointment.startDate|date("d/m/Y H:i") }}
+                                </p>
+                                <p class="flex items-center gap-2">
+                                    <svg data-lucide="user" class="w-4 h-4 text-gray-500"></svg>
+                                    au {{ appointment.endDate|date("d/m/Y H:i") }}
+                                </p>
+                            </div>
+
+                            <div class="mt-4">
+                                <button onclick="downloadInvoice('{{ appointment._id }}')" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition">
+                                    Télécharger la facture
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center mt-12 text-gray-500 text-lg">
+                <svg data-lucide="package" class="mx-auto mb-2 w-8 h-8 text-gray-400"></svg>
+                Aucun casier réservé pour le moment.
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 
- {% block javascripts %}
-     <script>
-         async function bookAppointment() {
-             const urlString = window.location.href;
-             const url = new URL(urlString);
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
 
-             const userId = {{ user.id|json_encode|raw }};
-             const lockerId = url.searchParams.get('lockerId');
-             const duration = url.searchParams.get('duration');
+        async function bookAppointment() {
+            const urlString = window.location.href;
+            const url = new URL(urlString);
 
-             const data = {
-                 user: userId,
-                 lockerId: lockerId,
-                 startDate: new Date().toISOString(),
-                 endDate: new Date(Date.now() + duration * 60 * 60 * 1000).toISOString()
-             };
+            const userId = {{ user.id|json_encode|raw }};
+            const lockerId = url.searchParams.get('lockerId');
+            const duration = url.searchParams.get('duration');
 
-             const res = await fetch('/api/bookings', {
-                 method: 'POST',
-                 headers: {'Content-Type': 'application/json'},
-                 body: JSON.stringify(data)
-             });
+            if (!lockerId || !duration) return;
 
-             if (res.ok) {
-                 window.location.href = '/users/' + userId + '/bookings';
-             }
-         }
+            const data = {
+                user: userId,
+                lockerId: lockerId,
+                startDate: new Date().toISOString(),
+                endDate: new Date(Date.now() + duration * 60 * 60 * 1000).toISOString()
+            };
 
-         // Appeler la fonction si besoin
-         bookAppointment();
-     </script>
+            const res = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
 
- {% endblock %}
+            if (res.ok) {
+                window.location.href = '/users/' + userId + '/bookings';
+            }
+        }
+
+        async function downloadInvoice(bookingId) {
+            await Swal.fire({
+                title: "Génération en cours",
+                text: `La facture pour la réservation #${bookingId} est en cours de préparation.`,
+                icon: "info",
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            // TODO: remplacer ce comportement fictif par une vraie génération PDF plus tard
+        }
+
+        bookAppointment();
+    </script>
+{% endblock %}

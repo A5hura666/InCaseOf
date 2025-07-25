@@ -50,13 +50,26 @@ async function checkExpiredBookings() {
         });
 
         for (const booking of expiredBookings) {
+            const locker = await Locker.findById(booking.locker);
+            const user = await User.findById(booking.user);
             // Libérer le casier
             await Locker.findByIdAndUpdate(booking.locker, { lockerStatus: "free" });
 
             // Mettre à jour le statut du booking
             await Booking.findByIdAndUpdate(booking._id, { status: "closed" });
 
-            console.log(`Booking ${booking._id} expired, status updated to 'closed', and locker ${booking.locker} released`);
+            const emailTemplatePath = join(__dirname, '..', 'views', 'emails', 'expiration.html');
+            let emailHTML = readFileSync(emailTemplatePath, 'utf8');
+            emailHTML = emailHTML.replace('{{userName}}', user.firstName)
+                .replace('{{lockerNumber}}', locker.lockerNumber);
+
+            await sendEmail({
+                to: user.email,
+                subject: 'Votre casier a été libéré',
+                html: emailHTML
+            });
+
+            console.log(`Booking of user ${user.firstName} ${user.lastName} expired, status updated to 'closed', and locker ${locker.lockerNumber} released`);
         }
     } catch (err) {
         console.error('Error checking expired bookings: ', err);

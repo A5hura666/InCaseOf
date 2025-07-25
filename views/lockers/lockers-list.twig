@@ -16,17 +16,14 @@
             {% for row in lockers %}
                 {% for cell in row %}
                     {% if cell.start %}
-                        <div
-                                class="
-        p-4 rounded shadow transition-shadow col-span-{{ cell.colSpan }} row-span-{{ cell.rowSpan }} relative
-        {% if cell.locker.lockerStatus == 'free' %}
-            bg-green-100 hover:shadow-lg
-        {% elseif cell.locker.lockerStatus == 'booked' %}
-            bg-yellow-200 opacity-70 cursor-not-allowed
-        {% elseif cell.locker.lockerStatus == 'blocked' %}
-            bg-red-300 opacity-50 cursor-not-allowed
-        {% endif %}
-    "
+                        <div class="p-5 rounded-2xl shadow-sm border transition-all duration-200 col-span-{{ cell.colSpan }} row-span-{{ cell.rowSpan }} relative group
+                            {% if cell.locker.lockerStatus == 'free' %}
+                                bg-green-50 border-green-300 hover:shadow-md hover:border-green-500 cursor-pointer
+                            {% elseif cell.locker.lockerStatus == 'booked' %}
+                                bg-yellow-50 border-yellow-300 text-yellow-900 opacity-70 cursor-not-allowed
+                            {% elseif cell.locker.lockerStatus == 'blocked' %}
+                                bg-red-50 border-red-300 text-red-900 opacity-50 cursor-not-allowed
+                            {% endif %}"
                                 {% if cell.locker.lockerSize == 'small' %}
                                     style="height: 150px;"
                                 {% else %}
@@ -36,22 +33,24 @@
                                     onclick='reserveLocker({{ cell.locker.id|json_encode }})'
                                 {% endif %}
                         >
-                            <h2 class="text-xl font-semibold mb-2">Casier #{{ cell.locker.lockerNumber }}</h2>
-                            <p><strong>Taille:</strong> {{ cell.locker.lockerSize }}</p>
-                            <p><strong>Prix:</strong> {{ cell.locker.lockerPrice }} €</p>
-                            <p><strong>Statut:</strong>
-                                {% if cell.locker.lockerStatus == 'free' %}
-                                    <span class="text-green-600 font-bold">Libre</span>
-                                {% elseif cell.locker.lockerStatus == 'booked' %}
-                                    <span class="text-yellow-800 font-semibold">Réservé</span>
-                                {% elseif cell.locker.lockerStatus == 'blocked' %}
-                                    <span class="text-red-700 font-semibold">Bloqué</span>
-                                {% endif %}
-                            </p>
+                            <h2 class="text-lg font-bold mb-2 text-gray-800">Casier #{{ cell.locker.lockerNumber }}</h2>
+                            <ul class="text-sm text-gray-700 space-y-1">
+                                <li><span class="font-medium text-gray-600">Taille :</span> {{ cell.locker.lockerSize | capitalize }}</li>
+                                <li><span class="font-medium text-gray-600">Prix :</span> {{ cell.locker.lockerPrice }} €</li>
+                                <li><span class="font-medium text-gray-600">Statut :</span>
+                                    {% if cell.locker.lockerStatus == 'free' %}
+                                        <span class="text-green-600 font-semibold">Libre</span>
+                                    {% elseif cell.locker.lockerStatus == 'booked' %}
+                                        <span class="text-yellow-700 font-semibold">Réservé</span>
+                                    {% elseif cell.locker.lockerStatus == 'blocked' %}
+                                        <span class="text-red-600 font-semibold">Bloqué</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
 
                             {% if user and user["role"] == 'Admin' %}
-                                <div class="absolute bottom-2 right-2 flex gap-3">
-                                    <button class="edit-btn bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-2 rounded text-sm flex items-center"
+                                <div class="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button class="edit-btn bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full shadow-sm"
                                             data-id="{{ cell.locker._id }}"
                                             data-locker-number="{{ cell.locker.lockerNumber }}"
                                             data-locker-size="{{ cell.locker.lockerSize }}"
@@ -60,8 +59,8 @@
                                         <i data-lucide="pencil" class="w-6 h-6"></i>
                                     </button>
 
-                                    <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-2 py-2 rounded text-sm flex items-center"
-                                            data-id="{{ cell.locker.id }}">
+                                    <button class="delete-btn bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-sm"
+                                        data-id="{{ cell.locker.id }}">
                                         <i data-lucide="trash-2" class="w-6 h-6"></i>
                                     </button>
                                 </div>

@@ -36,7 +36,7 @@
                             <h2 class="text-lg font-bold mb-2 text-gray-800">Casier #{{ cell.locker.lockerNumber }}</h2>
                             <ul class="text-sm text-gray-700 space-y-1">
                                 <li><span class="font-medium text-gray-600">Taille :</span> {{ cell.locker.lockerSize | capitalize }}</li>
-                                <li><span class="font-medium text-gray-600">Prix :</span> {{ cell.locker.lockerPrice }} €</li>
+                                <li><span class="font-medium text-gray-600">Prix :</span> {{ cell.locker.lockerPrice }} € / heure</li>
                                 <li><span class="font-medium text-gray-600">Statut :</span>
                                     {% if cell.locker.lockerStatus == 'free' %}
                                         <span class="text-green-600 font-semibold">Libre</span>

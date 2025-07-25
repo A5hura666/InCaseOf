@@ -64,6 +64,17 @@ exports.register = async (req, res) => {
         });
 
         await newUser.save();
+
+        const emailTemplatePath = path.join(__dirname, '..', 'views', 'emails', 'welcome.html');
+        let emailHTML = fs.readFileSync(emailTemplatePath, 'utf-8');
+        emailHTML = emailHTML.replace('{{firstName}}', firstName);
+
+        await sendEmail({
+            to: email,
+            subject: 'Bienvenue sur InCaseOf 🎉',
+            html: emailHTML
+        });
+
         res.redirect('/auth/login');
     } catch (error) {
         res.status(500).render('authentification/register', {

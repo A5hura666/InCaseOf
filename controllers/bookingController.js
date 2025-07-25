@@ -1,6 +1,9 @@
 const Bookings = require("../models/Booking");
 const Locker = require("../models/Locker");
 const User = require("../models/User");
+const sendEmail = require('../utils/mailer');
+const path = require('path');
+const fs = require('fs');
 
 exports.getBookings = async (req, res) => {
     try {
@@ -29,6 +32,23 @@ exports.postBooking = async (req, res) => {
 
             lockerBooked.lockerStatus = "booked";
             await lockerBooked.save(); // attention : await sinon non bloquant
+
+            const emailTemplatePath = path.join(__dirname, '..', 'views', 'emails', 'booking-confirmation.html');
+            let emailHTML = fs.readFileSync(emailTemplatePath, 'utf-8');
+
+            emailHTML = emailHTML
+                .replace('{{firstName}}', user.firstName)
+                .replace('{{lockerNumber}}', lockerBooked.lockerNumber)
+                .replace('{{lockerSize}}', lockerBooked.lockerSize)
+                .replace('{{startDate}}', new Date(req.body.startDate).toLocaleString('fr-FR'))
+                .replace('{{endDate}}', new Date(req.body.endDate).toLocaleString('fr-FR'))
+                .replace('{{totalPrice}}', req.body.totalPrice);
+
+            await sendEmail({
+                to: user.email,
+                subject: 'Confirmation de votre réservation',
+                html: emailHTML
+            });
 
             res.status(201).json(registeredBookings);
         } else {

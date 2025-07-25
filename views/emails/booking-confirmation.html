@@ -1,0 +1,35 @@
+<!-- views/emails/booking-confirmation.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation de Réservation</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 30px; color: #333;">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px;">
+    <tr>
+        <td align="center" style="padding-bottom: 20px;">
+            <h2 style="color: #4f46e5;">Votre réservation est confirmée ✅</h2>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p>Bonjour {{firstName}},</p>
+            <p>Merci pour votre réservation. Voici les détails :</p>
+
+            <ul style="list-style: none; padding: 0;">
+                <li><strong>Numéro du casier :</strong> {{lockerNumber}}</li>
+                <li><strong>Taille du casier :</strong> {{lockerSize}}</li>
+                <li><strong>Date de début :</strong> {{startDate}}</li>
+                <li><strong>Date de fin :</strong> {{endDate}}</li>
+                <li><strong>Prix total :</strong> {{totalPrice}} €</li>
+            </ul>
+
+            <p style="margin-top: 20px;">Vous pouvez retrouver votre réservation dans votre espace client.</p>
+
+            <p style="margin-top: 30px;">Cordialement,<br>L’équipe InCaseOf</p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
